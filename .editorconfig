@@ -1,0 +1,15 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# Top-most EditorConfig file.
+root = true
+
+[*.{c,cpp,h,hpp,txt,cs}]
+charset = utf-8
+guidelines = 120
+guidelines_style = 2.5px solid 40ffffff
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+end_of_line=lf
+
