@@ -5,7 +5,9 @@ using UnityRawInput;
 
 public class ScreencastKeys : EditorWindow
 {
-    [MenuItem("Window/UIElements/ScreencastKeys")]
+    private Label KeycastLabel { get; set; }
+
+    [MenuItem("Window/ScreencastKeys")]
     public static void ShowExample()
     {
         ScreencastKeys window = GetWindow<ScreencastKeys>();
@@ -18,8 +20,8 @@ public class ScreencastKeys : EditorWindow
         VisualElement root = rootVisualElement;
 
         // VisualElements objects can contain other VisualElement following a tree hierarchy.
-        VisualElement label = new Label("Hello World! From C#");
-        root.Add(label);
+        KeycastLabel = new Label("...");
+        root.Add(KeycastLabel);
 
         // Import UXML
         var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath(UXML_FILE_GUID));
@@ -46,7 +48,8 @@ public class ScreencastKeys : EditorWindow
 
     private void HandleKeyDown(RawKey key)
     {
-        Debug.Log("Keydown : " + key.ToString());
+        KeycastLabel.text = key.ToString();
+        Debug.Log(key.ToString());
     }
 
     //
