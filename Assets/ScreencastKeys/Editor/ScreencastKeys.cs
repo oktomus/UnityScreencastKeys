@@ -11,7 +11,7 @@ public class ScreencastKeys : EditorWindow
     public static void ShowExample()
     {
         ScreencastKeys window = GetWindow<ScreencastKeys>();
-        window.titleContent = new GUIContent("ScreencastKeys");
+        window.Show();
     }
 
     public void OnEnable()
@@ -19,21 +19,17 @@ public class ScreencastKeys : EditorWindow
         // Each editor window contains a root VisualElement object
         VisualElement root = rootVisualElement;
 
-        // VisualElements objects can contain other VisualElement following a tree hierarchy.
-        KeycastLabel = new Label("...");
-        root.Add(KeycastLabel);
-
         // Import UXML
         var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath(UXML_FILE_GUID));
         VisualElement labelFromUXML = visualTree.CloneTree();
         root.Add(labelFromUXML);
 
-        // A stylesheet can be added to a VisualElement.
-        // The style will be applied to the VisualElement and all of its children.
+        // Import USS
         var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(AssetDatabase.GUIDToAssetPath(USS_FILE_GUID));
-        VisualElement labelWithStyle = new Label("Hello World! With Style");
-        labelWithStyle.styleSheets.Add(styleSheet);
-        root.Add(labelWithStyle);
+        root.styleSheets.Add(styleSheet);
+
+        KeycastLabel = new Label("...");
+        root.Add(KeycastLabel);
 
         // Listen to keyboard events.
         RawKeyInput.Start(false);
@@ -49,7 +45,6 @@ public class ScreencastKeys : EditorWindow
     private void HandleKeyDown(RawKey key)
     {
         KeycastLabel.text = key.ToString();
-        Debug.Log(key.ToString());
     }
 
     //
