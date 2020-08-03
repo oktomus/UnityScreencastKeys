@@ -27,7 +27,6 @@
 //
 
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 using UnityRawInput;
 
@@ -72,7 +71,30 @@ public class ScreencastKeys : EditorWindow
 
     private void HandleKeyDown(RawKey key)
     {
-        KeycastLabel.text = key.ToString();
+        KeycastLabel.text = RawKeyToPrettyString(key);
+    }
+
+    private string RawKeyToPrettyString(RawKey key)
+    {
+        string keyString = key.ToString();
+
+        // Special handle : numpads.
+        if (key >= RawKey.Numpad0 && key <= RawKey.Numpad9)
+        {
+            return keyString.Replace("Numpad", "");
+        }
+
+        // Special handle : maths.
+        if (key == RawKey.Divide) { return "/"; }
+        else if (key == RawKey.Multiply) { return "*"; }
+        else if (key == RawKey.Subtract) { return "-"; }
+        else if (key == RawKey.Add) { return "+"; }
+        else if (key == RawKey.Decimal) { return "."; }
+
+        // Alt handle.
+        if (key == RawKey.Menu) { return "Alt"; }
+
+        return keyString;
     }
 
     //
