@@ -34,6 +34,10 @@ public class ScreencastKeys : EditorWindow
 {
     private Label KeycastLabel { get; set; }
 
+    private bool IsCtrl { get; set; }
+    private bool IsAlt { get; set; }
+    private bool IsShift { get; set; }
+
     [MenuItem("Window/ScreencastKeys")]
     public static void ShowExample()
     {
@@ -61,17 +65,38 @@ public class ScreencastKeys : EditorWindow
         // Listen to keyboard events.
         RawKeyInput.Start(false);
         RawKeyInput.OnKeyDown += HandleKeyDown;
+        RawKeyInput.OnKeyUp += HandleKeyUp;
     }
 
     private void OnDisable()
     {
         RawKeyInput.OnKeyDown -= HandleKeyDown;
+        RawKeyInput.OnKeyUp -= HandleKeyUp;
+
+        IsCtrl = IsAlt = IsShift = false;
+
         RawKeyInput.Stop();
     }
 
     private void HandleKeyDown(RawKey key)
     {
+        // Activate modifiers.
+        IsCtrl = IsCtrl || (key == RawKey.Control || key == RawKey.LeftControl || key == RawKey.RightControl);
+        IsShift = IsShift || (key == RawKey.Shift || key == RawKey.LeftShift || key == RawKey.RightShift);
+        IsAlt = IsAlt || (key == RawKey.Menu || key == RawKey.LeftMenu || key == RawKey.RightMenu);
+
         KeycastLabel.text = RawKeyToPrettyString(key);
+    }
+
+    private void HandleKeyUp(RawKey key)
+    {
+        // Deactivate modifiers.
+        if (IsCtrl && (key == RawKey.Control || key == RawKey.LeftControl || key == RawKey.RightControl))
+        { IsCtrl = false; }
+        if (IsShift && (key == RawKey.Shift || key == RawKey.LeftShift || key == RawKey.RightShift))
+        { IsShift = false; }
+        if (IsAlt && (key == RawKey.Menu || key == RawKey.LeftMenu || key == RawKey.RightMenu))
+        { IsAlt = false; }
     }
 
     private string RawKeyToPrettyString(RawKey key)
@@ -81,20 +106,37 @@ public class ScreencastKeys : EditorWindow
         // Special handle : numpads.
         if (key >= RawKey.Numpad0 && key <= RawKey.Numpad9)
         {
-            return keyString.Replace("Numpad", "");
+            keyString = keyString.Replace("Numpad", "");
         }
 
         // Special handle : maths.
-        if (key == RawKey.Divide) { return "/"; }
-        else if (key == RawKey.Multiply) { return "*"; }
-        else if (key == RawKey.Subtract) { return "-"; }
-        else if (key == RawKey.Add) { return "+"; }
-        else if (key == RawKey.Decimal) { return "."; }
+        if (key == RawKey.Divide) { keyString = "/"; }
+        else if (key == RawKey.Multiply) { keyString = "*"; }
+        else if (key == RawKey.Subtract) { keyString = "-"; }
+        else if (key == RawKey.Add) { keyString = "+"; }
+        else if (key == RawKey.Decimal) { keyString = "."; }
 
-        // Alt handle.
-        if (key == RawKey.Menu) { return "Alt"; }
+        // Special handle : modifiers.
+        if (key == RawKey.Control || key == RawKey.LeftControl || key == RawKey.RightControl
+            || key == RawKey.Shift || key == RawKey.LeftShift || key == RawKey.RightShift
+            || key == RawKey.Menu || key == RawKey.LeftMenu || key == RawKey.RightMenu)
+        { keyString = ""; }
 
-        return keyString;
+        // Prefix with modifiers.
+        string prefix =
+            IsCtrl && IsShift && IsAlt ? "Ctrl + Shift + Alt" :
+            IsCtrl && IsAlt ? "Ctrl + Alt" :
+            IsCtrl && IsShift ? "Ctrl + Shift" :
+            IsCtrl ? "Ctrl" :
+            IsShift && IsAlt ? "Shift + Alt" :
+            IsShift ? "Shift" :
+            IsAlt ? "Alt" :
+            "";
+
+        if (!string.IsNullOrEmpty(keyString) && !string.IsNullOrEmpty(prefix))
+        { prefix += " + "; }
+
+        return prefix + keyString;
     }
 
     //
